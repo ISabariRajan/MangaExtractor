@@ -70,7 +70,7 @@ class Selenium:
         :param tab_name: Name the tab
         :param url: Open a new tab with the url specified
         :return: The driver
-        :doc-author: Trelent
+        :doc-author: Sabari
         """
         driver = self.driver
         self.home_window = driver.current_window_handle
@@ -87,7 +87,7 @@ class Selenium:
         
         :param self: Access the attributes and methods of a class
         :return: A tab
-        :doc-author: Trelent
+        :doc-author: Sabari
         """
         self.switch_tab(self.home_window)
 
@@ -101,7 +101,7 @@ class Selenium:
         :param self: Represent the instance of the class
         :param tab_name: Switch to a new tab
         :return: The name of the tab that is currently open
-        :doc-author: Trelent
+        :doc-author: Sabari
         """
         self.driver.switch_to.window(f"{tab_name}")
 
@@ -112,6 +112,6 @@ class Selenium:
         
         :param self: Represent the instance of the class
         :return: Nothing
-        :doc-author: Trelent
+        :doc-author: Sabari
         """
         self.driver.close()

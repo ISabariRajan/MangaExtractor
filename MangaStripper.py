@@ -10,7 +10,7 @@ class MangaStripper:
 
         :param self: Access the class variables and methods
         :return: A dictionary object with details of manga chapters
-        :doc-author: Trelent
+        :doc-author: Sabari
         """
         
         if file_exists(self.chapters_json):
@@ -27,26 +27,20 @@ class MangaStripper:
         """
         self.get_manga_info_from_page()
         folder_chapters_info = self.get_manga_info_from_folder()
-        new_chapters = {}
+        new_chapters = True
 
         # If manga folder has chapter information, then compare with web info
         # and the store uncapture info as new chapter
         # If no chapter information in Manga Folder, then store web info as new chapters
         if folder_chapters_info:
             for chapter_name in self.chapters_info:
-                if chapter_name not in folder_chapters_info:
+                if chapter_name in folder_chapters_info:
                     self.chapters_info[chapter_name] = folder_chapters_info[chapter_name]
-                #     if not folder_chapters_info[chapter_name]["completed"]:
-                #         new_chapters[chapter_name] = folder_chapters_info[chapter_name]
-                # else:
-                #     new_chapters[chapter_name] = self.chapters_info[chapter_name]
-                # print(chapter_name)
-        else:
-            new_chapters = self.chapters_info
-        
-        self.new_chapters = new_chapters
+                else:
+                    new_chapters = False
+
         # Return if there are new chapters
-        return len(new_chapters.keys()) > 0
+        return new_chapters
 
 class ChapMangaNelo(MangaStripper):
 
@@ -68,7 +62,7 @@ class ChapMangaNelo(MangaStripper):
         
         :param self: Access the attributes and methods of the class in python
         :return: A dictionary of dictionaries
-        :doc-author: Trelent
+        :doc-author: Sabari
         """
         selenium = self.selenium
         chapter_list = selenium.find_element_by_id("row-content-chapter")
@@ -98,7 +92,7 @@ class ChapMangaNelo(MangaStripper):
         :param chapter_name: Create a new folder for the chapter
         :param chapter_images: Store the images in a list
         :return: A list of the image names in a chapter
-        :doc-author: Trelent
+        :doc-author: Sabari
         """
         chapter_folder = create_new_folder(join_path(self.folder_name, chapter_name))
         images = []
@@ -121,7 +115,7 @@ class ChapMangaNelo(MangaStripper):
         :param self: Refer to the object itself
         :param chapter: Extract the name and href of the chapter
         :return: None
-        :doc-author: Trelent
+        :doc-author: Sabari
         """
         selenium = self.selenium
         name = chapter["name"]
@@ -140,12 +134,20 @@ class ChapMangaNelo(MangaStripper):
 
 
     def extract_new_chapters(self):
-        selenium = self.selenium
+        
+        """
+        The extract_new_chapters function extracts all chapters that have not been extracted yet.
+            It does this by checking the completed field in the chapter_info dictionary for each chapter.
+            If it is False, then it calls extract_chapter_to_folder to extract that chapter.
+        
+        :param self: Access the attributes and methods of the class
+        :return: The updated chapters_info dictionary
+        :doc-author: Sabari
+        """
         if self.require_extraction():
             for chapter_name in self.chapters_info:
                 chapter_info = self.chapters_info[chapter_name]
                 if not chapter_info["completed"]:
-                # print(self.new_chapters)
                     self.extract_chapter_to_folder(chapter_info)
                 write_json(self.chapters_json, self.chapters_info)
 
@@ -157,7 +159,7 @@ class ChapMangaNelo(MangaStripper):
         :param self: Refer to the current instance of the class
         :param manga_id: Create the manga_url variable
         :return: The name of the folder where the manga will be downloaded
-        :doc-author: Trelent
+        :doc-author: Sabari
         """
         if "http" not in manga_id:
             manga_url = self.base_url + manga_id
