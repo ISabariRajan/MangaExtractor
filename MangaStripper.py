@@ -1,6 +1,6 @@
 from Selenium import Selenium
 from Utilities import create_new_folder, join_path, file_exists, read_json
-from Utilities import write_json, download_file, non_char_to_underscore
+from Utilities import write_json, download_file, non_char_to_underscore, log
 
 
 class MangaStripper:
@@ -66,7 +66,7 @@ class ChapMangaNelo(MangaStripper):
         """
         selenium = self.selenium
         chapter_list = selenium.find_element_by_id("row-content-chapter")
-        chapter_list = selenium.find_elements_by_tag_name("li", chapter_list)
+        chapter_list = selenium.find_elements_by_tag_name("li", chapter_list)[::-1]
 
         chapters_info = {}
         # Loop through chapter list and get manga info
@@ -94,7 +94,8 @@ class ChapMangaNelo(MangaStripper):
         :return: A list of the image names in a chapter
         :doc-author: Sabari
         """
-        chapter_folder = create_new_folder(join_path(self.folder_name, chapter_name))
+        chapter_folder = create_new_folder(join_path(self.folder_name, 
+                                                     non_char_to_underscore(chapter_name)))
         images = []
         for img in chapter_images:
             image_href = (img.get_dom_attribute("src"))
@@ -151,32 +152,38 @@ class ChapMangaNelo(MangaStripper):
                     self.extract_chapter_to_folder(chapter_info)
                 write_json(self.chapters_json, self.chapters_info)
 
-    def extract_manga(self, manga_id):
+    def extract_manga(self, manga_url):
         
         """
         The extract_manga function is the main function of this class. It takes a manga_id as an argument, and extracts all chapters from that manga into a folder with the name of the manga.
         
         :param self: Refer to the current instance of the class
-        :param manga_id: Create the manga_url variable
-        :return: The name of the folder where the manga will be downloaded
+        :param manga_url: Create the manga_url variable
+        :return: True if everything goes well
         :doc-author: Sabari
         """
-        if "http" not in manga_id:
-            manga_url = self.base_url + manga_id
+        if "http" not in manga_url:
+            manga_url = self.base_url + manga_url
+        
         selenium = self.selenium
 
         # Go to the manga page
         selenium.get(manga_url)
 
         # Extract the manga title
-        info = selenium.find_elements_by_class_name("story-info-right")[0]
-        heading = selenium.find_elements_by_tag_name("h1", info)[0].text
-        print(f"Striping Manga Title: {heading}")
+        try:
+            info = selenium.find_elements_by_class_name("story-info-right")[0]
+            heading = selenium.find_elements_by_tag_name("h1", info)[0].text
+            log(f"Striping Manga Title: {heading}")
+        except:
+            log(f"Error Finding Heading: {manga_url}")
+            return
         self.folder_name = create_new_folder(
             join_path("Mangas", non_char_to_underscore(heading))
         )
         self.chapters_json = join_path(self.folder_name, "chapters.json")
         self.extract_new_chapters()
+        return True
     
     def close(self):
         self.selenium.close()

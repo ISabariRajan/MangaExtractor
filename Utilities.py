@@ -37,7 +37,7 @@ def non_char_to_underscore(text):
     :return: A string with all non-alphanumeric characters replaced by underscores
     :doc-author: Sabari
     """
-    check_text = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY1234567890.-"
+    check_text = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY1234567890-"
     text = text.strip()
     new_text = ""
     for t in text:
